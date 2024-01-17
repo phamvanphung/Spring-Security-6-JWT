@@ -11,7 +11,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
@@ -20,30 +19,36 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SpringSecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter ;
-    private final CustomerUserDetailsService customerUserDetailsService ;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomerUserDetailsService customerUserDetailsService;
 
     @Bean
-    public SecurityFilterChain filterChain (HttpSecurity http) throws Exception
-    { http
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeHttpRequests()
-            .requestMatchers("/user/**").permitAll()
+            .requestMatchers(
+                "/user/**",
+                "/swagger-ui/**",
+                "/api-docs/**"
+            ).permitAll()
             .requestMatchers("/admin/**").hasAuthority("ADMIN")
-            .requestMatchers("/superadmin/**").hasAuthority("SUPERADMIN") ;
+            .requestMatchers("/superadmin/**").hasAuthority("SUPERADMIN");
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return  http.build();
+        return http.build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception
-    { return authenticationConfiguration.getAuthenticationManager();}
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 
     @Bean
-    public PasswordEncoder passwordEncoder()
-    { return new BCryptPasswordEncoder(); }
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
 }

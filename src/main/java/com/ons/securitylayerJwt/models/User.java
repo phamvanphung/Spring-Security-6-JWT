@@ -18,6 +18,7 @@ import java.util.*;
 @ToString
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Table(name = "users")
 public class User implements Serializable , UserDetails {
 
 
